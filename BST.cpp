@@ -1,17 +1,21 @@
 #include "BST.h"
 #include <cmath>
 #include <list>
+#include <vector>
 #include <iostream>
 #include <sstream>
 using std::list;
+using std::vector;
 using std::cout;
 using std::endl;
+using std::string;
 using std::stringstream;
 
 template <typename T>
 BST<T>::BST() {
   root = 0;
   depth = 0;
+  widestVal = 0;
 }
 
 template <typename T>
@@ -46,6 +50,13 @@ void BST<T>::insert(T v) {
   if (curDepth > depth) {
     depth = curDepth;
   }
+  
+    std::stringstream getLen;
+    getLen << v;
+    int length = getLen.str().length();
+    if (length > widestVal) {
+        widestVal = length;
+    }
 }
 
 template <typename T>
@@ -54,105 +65,81 @@ void BST<T>::remove(T v) {
   root = temp;
 }
 
-//template <typename T>
-//void BST<T>::print() {
-//  traversalPrint(root);
-//}
 template <typename T>
 void BST<T>::print() {
+    int valSize = widestVal;
     list< Node<T>* >* frontier = new list< Node<T>* >();
     frontier->push_back(root);
-    int level = 0;
-    int curLevelNodes = 0;
-    int levelNodes, nodeSpace, nodePreSpace, nodePostSpace, fSlashPostSpace, fSlashPreSpace, bSlashPreSpace, bSlashPostSpace;
-    //int fSlashPreSpace, fSlashPostSpace, bSlashPreSpace,
-        //bSlashPostSpace;
-    stringstream nodeString;
-    
-//    cout << "DEPTH: " << depth << endl << endl;
 
-    int k = 0;
-    while (frontier->empty() == false) {
-    //for (int k = 0; k < pow(2, depth); ++k) {
+    // for each level
+    for (int level = 0; level < depth; ++level) {
+        int numNodes = pow(2, level);
+        int nodePreSpace = valSize * pow(2, depth - level - 1) - 1;
+        int nodePostSpace = valSize * pow(2, depth - level - 1);
 
-        if (curLevelNodes == 0) {
-            levelNodes = pow(2, level);
-            nodeSpace = pow(2, depth - level);
-            nodePreSpace = pow(2, depth - level - 1) - 1;
-            nodePostSpace = pow(2, depth - level - 1);
-            fSlashPostSpace = ceil(nodePostSpace / 2.0);
-            fSlashPreSpace = nodeSpace - fSlashPostSpace - 1;
-            bSlashPreSpace = floor(nodePreSpace / 2.0);
-            bSlashPostSpace = nodeSpace - bSlashPreSpace - 1;
-/*
-            cout << "nodeSpace: " << nodeSpace << endl;
-            cout << "nodePreSpace: " << nodePreSpace << endl;
-            cout << "nodePostSpace: " << nodePostSpace << endl;
-            cout << "fSlashPostSpace: " << fSlashPostSpace << endl;
-            cout << "fSlashPreSpace: " << fSlashPreSpace << endl;
-            cout << "bSlashPreSpace: " << bSlashPreSpace << endl;
-            cout << "bSlashPostSpace: " << bSlashPostSpace << endl << endl;
-*/
-            if (k > 0) {
-                bool fSlash = true;
-                for (int i = 0; i < levelNodes; ++i) {
-                    if (fSlash) {
-                        for (int j = 0; j < fSlashPreSpace; ++j) {
-                            nodeString << " ";
-                        }
-                        nodeString << "/";
-                        for (int j = 0; j < fSlashPostSpace; ++j) {
-                            nodeString << " ";
-                        }
-                    } else {
-                        for (int j = 0; j < bSlashPreSpace; ++j) {
-                            nodeString << " ";
-                        }
-                        nodeString << "\\";
-                        for (int j = 0; j < bSlashPostSpace; ++j) {
-                            nodeString << " ";
-                        }
+        // for each node in that level
+        for (int n = 0; n < numNodes; ++n) {
+            Node<T>* curNode = frontier->front();
+            frontier->pop_front();
+
+            for (int i = 0; i < nodePreSpace; ++i) {
+                cout << " ";
+            }
+
+            if (curNode != 0) {
+                std::stringstream getLen;
+                getLen << curNode->getValue();
+                int length = getLen.str().length();
+                nodePostSpace = nodePostSpace - (length - 1);
+                cout << curNode->getValue();
+                frontier->push_back(curNode->getLeftChild());
+                frontier->push_back(curNode->getRightChild());
+            }
+            else {
+                cout << "X";
+                frontier->push_back(0);
+            }
+
+            for (int i = 0; i < nodePostSpace; ++i) {
+                cout << " ";
+            }
+        }
+
+        if (level < depth - 1) {
+            cout << endl;
+            int nodeSpace = valSize * pow(2, depth - level - 1);
+            int bSlashPreSpace = floor(0.25*(nodeSpace - 1));
+            int bSlashPostSpace = nodeSpace - bSlashPreSpace - 1;
+            int fSlashPostSpace = bSlashPreSpace + 1;
+            int fSlashPreSpace = nodeSpace - fSlashPostSpace - 1;
+
+            bool fSlash = true;
+            for (int n = 0; n < numNodes*2; ++n) {
+                if (fSlash) {
+                    for (int i = 0; i < fSlashPreSpace; ++i) {
+                        cout << " ";
                     }
-                    fSlash = !fSlash;
+                    cout << "/";
+                    for (int i = 0; i < fSlashPostSpace; ++i) {
+                        cout << " ";
+                    }
                 }
-                nodeString << endl;
+                else if (!fSlash) {
+                    for (int i = 0; i < bSlashPreSpace; ++i) {
+                        cout << " ";
+                    }
+                    cout << "\\";
+                    for (int i = 0; i < bSlashPostSpace; ++i) {
+                        cout << " ";
+                    }
+                }
+                fSlash = !fSlash;
             }
         }
 
-        for (int i = 0; i < nodePreSpace; ++i) {
-            nodeString << " ";
-        }
-
-        Node<T>* curNode = frontier->front();
-        frontier->pop_front();
-        if (curNode != 0) {
-            frontier->push_back(curNode->getLeftChild());
-            frontier->push_back(curNode->getRightChild());
-            nodeString << curNode->getValue();
-        }
-        else {
-            nodeString << "X";
-        }
-
-        for (int i = 0; i < nodePostSpace; ++i) {
-            nodeString << " ";
-        }
-        ++curLevelNodes;
-        if (curLevelNodes == levelNodes) {
-            nodeString << endl;
-
-            if (level < depth) {
-            }
-
-            curLevelNodes = 0;
-            ++level;
-        }
-        ++k;
-
+        cout << endl;
     }
-    cout << nodeString.str() << endl;
 }
-
 template <typename T>
 void BST<T>::traversalPrint(Node<T>* root) {
   if(root != 0) {
