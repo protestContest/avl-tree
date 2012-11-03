@@ -61,8 +61,34 @@ void BST<T>::insert(T v) {
 
 template <typename T>
 void BST<T>::remove(T v) {
-  Node<T>* temp = new Node<T>(v);
-  root = temp;
+    Node<T>** cur = &root;
+    while (*cur != 0 && (*cur)->getValue() != v) {
+        if (v < (*cur)->getValue()) {
+            cur = &((*cur)->getLeftChild());
+        }
+        else if (v > (*cur)->getValue()) {
+            cur = &((*cur)->getRightChild());
+        }
+    }
+    if (*cur == 0) return;
+    Node<T>* deleteMe = *cur;
+
+    Node<T>* iop = (*cur)->getLeftChild();
+    if (iop == 0) {
+        *cur = (*cur)->getRightChild();
+        delete deleteMe;
+        return;
+    }
+
+    while (iop->getRightChild() != 0) {
+        iop = iop->getRightChild();
+        ++depth;
+    }
+
+    iop->setRightChild(*(*cur)->getRightChild());
+    *cur = (*cur)->getLeftChild();
+    
+    delete deleteMe;
 }
 
 template <typename T>
@@ -97,6 +123,7 @@ void BST<T>::print() {
             }
             else {
                 cout << "X";
+                frontier->push_back(0);
                 frontier->push_back(0);
             }
 
@@ -139,6 +166,7 @@ void BST<T>::print() {
 
         cout << endl;
     }
+    cout << endl;
 }
 template <typename T>
 void BST<T>::traversalPrint(Node<T>* root) {
