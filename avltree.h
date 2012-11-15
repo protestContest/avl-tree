@@ -11,8 +11,7 @@ class Avltree {
   void traversalPrint(Node<T>* root);
   int depth;
   int widestVal;
-  Node<T>* rotateRight(Node<T>* critNode);
-  Node<T>* rotateLeft(Node<T>* critNode);
+  void rotate(Node<T>* critNode, int dir);
 
  public:
   Avltree<T>();
