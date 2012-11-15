@@ -5,6 +5,7 @@ template <typename T>
 class Node {
  private:
   T value;
+  int balance;
   Node<T>* leftChild;
   Node<T>* rightChild;
 
@@ -17,5 +18,8 @@ class Node {
 
   Node<T>*& getRightChild();
   void setRightChild(Node<T>& n);
+
+  int getBalance();
+  void setBalance(int b);
 };
 #endif

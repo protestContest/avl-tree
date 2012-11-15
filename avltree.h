@@ -1,20 +1,22 @@
-#ifndef __BST_H__
-#define __BST_H__
+#ifndef __AVLTREE_H__
+#define __AVLTREE_H__
 
 #include "Node.h"
 #include <string>
 
 template <typename T>
-class BST {
+class Avltree {
  private:
   Node<T>* root;
   void traversalPrint(Node<T>* root);
   int depth;
   int widestVal;
+  Node<T>* rotateRight(Node<T>* critNode);
+  Node<T>* rotateLeft(Node<T>* critNode);
 
  public:
-  BST<T>();
-  ~BST<T>();
+  Avltree<T>();
+  ~Avltree<T>();
 
   bool find(T v);
   void remove(T v);

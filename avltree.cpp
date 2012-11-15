@@ -1,4 +1,4 @@
-#include "BST.h"
+#include "avltree.h"
 #include <cmath>
 #include <list>
 #include <vector>
@@ -12,40 +12,71 @@ using std::string;
 using std::stringstream;
 
 template <typename T>
-BST<T>::BST() {
+Avltree<T>::Avltree() {
   root = 0;
   depth = 0;
   widestVal = 0;
 }
 
 template <typename T>
-BST<T>::~BST() {
+Avltree<T>::~Avltree() {
   
 }
 
 
 template <typename T>
-bool BST<T>::find(T v) {
+bool Avltree<T>::find(T v) {
   Node<T>* temp = new Node<T>(v);
   root = temp;  
   return true;
 }
 
 template <typename T>
-void BST<T>::insert(T v) {
+void Avltree<T>::insert(T v) {
+    
+
+
+
   Node<T>* temp = new Node<T>(v);
   Node<T>** curr = &root;
+  Node<T>* critNode = 0;
+  vector< Node<T>* > path;
+  vector<string> moves;
+  path->push_back(root);
   int curDepth = 1;
 
   while (*curr != 0) {
     if (v < (*curr)->getValue()) {
       curr = &((*curr)->getLeftChild());
+      moves->push_back("l");
     } else if (v > (*curr)->getValue()) {
       curr = &((*curr)->getRightChild());
+      moves->push_back("r");
+    } else {
+      return;
     }
+    path->push_back(*curr);
     ++curDepth;
   }
   *curr = temp;
+
+  while(!moves->empty()) {
+    Node<T>* curNode = path->back();
+    string move = moves->back();
+
+    if (move == "l") {
+        curNode->setBalance(-1); 
+    } else if (move == "r") {
+        curNode->setBalance(1);
+    }
+
+    if (curNode == critNode) {
+        break;
+    }
+    
+    path->pop_back();
+    moves->pop_back();
+  }
 
   if (curDepth > depth) {
     depth = curDepth;
@@ -60,7 +91,7 @@ void BST<T>::insert(T v) {
 }
 
 template <typename T>
-void BST<T>::remove(T v) {
+void Avltree<T>::remove(T v) {
     Node<T>** cur = &root;
     while (*cur != 0 && (*cur)->getValue() != v) {
         if (v < (*cur)->getValue()) {
@@ -92,7 +123,7 @@ void BST<T>::remove(T v) {
 }
 
 template <typename T>
-void BST<T>::print() {
+void Avltree<T>::print() {
     int valSize = widestVal;
     list< Node<T>* >* frontier = new list< Node<T>* >();
     frontier->push_back(root);
@@ -169,7 +200,7 @@ void BST<T>::print() {
     cout << endl;
 }
 template <typename T>
-void BST<T>::traversalPrint(Node<T>* root) {
+void Avltree<T>::traversalPrint(Node<T>* root) {
   if(root != 0) {
     traversalPrint(root->getLeftChild());
     std::cout << root->getValue() << std::endl;
@@ -177,6 +208,6 @@ void BST<T>::traversalPrint(Node<T>* root) {
   }
 }
 
-template class BST<int>;
-template class BST<double>;
-template class BST<std::string>;
+template class Avltree<int>;
+template class Avltree<double>;
+template class Avltree<std::string>;

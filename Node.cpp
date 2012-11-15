@@ -33,6 +33,16 @@ void Node<T>::setRightChild(Node<T>& rc) {
   rightChild = &rc;
 }
 
+template <typename T>
+int Node<T>::getBalance() {
+    return balance;
+}
+
+template <typename T>
+void Node<T>::setBalance(int b) {
+    balance = b;
+}
+
 template class Node<int>;
 template class Node<double>;
 template class Node<std::string>;
