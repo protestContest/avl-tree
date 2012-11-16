@@ -12,7 +12,7 @@ class Avltree {
   void preorderPrint(Node<T>* root);
   int depth;
   int widestVal;
-  void rotate(Node<T>*& critNode, int dir);
+  void rotate(Node<T>** critNode, int dir);
 
  public:
   Avltree<T>();

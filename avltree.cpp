@@ -42,12 +42,13 @@ void Avltree<T>::insert(T v) {
     Node<T>* insertNode = new Node<T>(v);
     vector< Node<T>* >* path = new vector< Node<T>* >();
     path->push_back(root);
-    Node<T>* critNode = 0;
+    Node<T>** critNode = 0;
 
     Node<T>** curNode = &root;
     while (*curNode != 0 && (*curNode)->getValue() != v) {
+        path->push_back(*curNode);
         if ((*curNode)->getBalance() != 0) {
-            critNode = *curNode;
+            critNode = curNode;
         }
         if (v < (*curNode)->getValue()) {
             curNode = &(*curNode)->getLeftChild();
@@ -73,35 +74,38 @@ void Avltree<T>::insert(T v) {
     if (critNode == 0) {
         r = root;
     } else {
-        Node<T>* critChild = 0;
+        cout << "Critical Node: " << (*critNode)->getValue() << endl;
+        Node<T>** critChild = 0;
         int critChildDir = 0;
-        if (v < critNode->getValue()) {
-            critChild = critNode->getLeftChild();
+        if (v < (*critNode)->getValue()) {
+            critChild = &(*critNode)->getLeftChild();
             critChildDir = -1;
         } else {
-            critChild = critNode->getRightChild();
+            critChild = &(*critNode)->getRightChild();
             critChildDir = 1;
         }
 
         // no rotation
-        if (critNode->getBalance() != critChildDir) {
-            critNode->setBalance(0);
-            r = insertNode;
+        if ((*critNode)->getBalance() != critChildDir) {
+            (*critNode)->setBalance(0);
+            //r = insertNode;
+            r = path->back();
+            cout << "R becomes " << r->getValue() << endl;
         } else {
             Node<T>* critGC = 0;
             int critGCDir = 0;
-            if (v < critChild->getValue()) {
-                critGC = critChild->getLeftChild();
+            if (v < (*critChild)->getValue()) {
+                critGC = (*critChild)->getLeftChild();
                 critGCDir = -1;
             } else {
-                critGC = critChild->getRightChild();
+                critGC = (*critChild)->getRightChild();
                 critGCDir = 1;
             }
 
             // single rotation
             if (critGCDir == critChildDir) {
                 cout << "single rotation" << endl;
-                critNode->setBalance(0);
+                (*critNode)->setBalance(0);
                 r = critGC;
                 rotate(critNode, -critChildDir);
             }
@@ -112,18 +116,20 @@ void Avltree<T>::insert(T v) {
                 if (v < critGC->getValue()) {
                     r = critGC->getLeftChild();
                     rDir = -1;
-                } else {
+                } else if (v > critGC->getValue()){
                     r = critGC->getRightChild();
                     rDir = 1;
+                } else {
+                    r = critGC;
                 }
 
                 if (rDir == critGCDir) {
-                    critNode->setBalance(0);
-                    critChild->setBalance(critChildDir);
+                    (*critNode)->setBalance(0);
+                    (*critChild)->setBalance(critChildDir);
                 } else if (rDir == -critGCDir) {
-                    critNode->setBalance(critGCDir);
+                    (*critNode)->setBalance(critGCDir);
                 } else {
-                    critNode->setBalance(0);
+                    (*critNode)->setBalance(0);
                 }
                 
                 // what if critNode == root?
@@ -134,16 +140,39 @@ void Avltree<T>::insert(T v) {
         }
     }
 
-    while (r != 0 && r->getValue() != v) {
+    cout << "Updating balances:";
+    while (r->getValue() != v) {
+        cout << r->getValue() << " ";
         if (v < r->getValue()) {
-            r->setBalance(-1);
+            r->setBalance(r->getBalance()-1);
             r = r->getLeftChild();
         } else {
-            r->setBalance(1);
+            r->setBalance(r->getBalance()+1);
             r = r->getRightChild();
         }
     }
+    cout << endl;
     delete path;
+
+}
+
+template <typename T>
+void Avltree<T>::rotate(Node<T>** critNode, int dir) {
+    if (dir == -1) {
+        cout << "rotating left: " << (*critNode)->getValue() << endl;
+        Node<T>* rightChild = (*critNode)->getRightChild();
+        Node<T>* rightLC = (rightChild)->getLeftChild();
+        rightChild->setLeftChild(*critNode);
+        (*critNode)->setRightChild(rightLC);
+        *critNode = rightChild;
+    } else if (dir == 1) {
+        cout << "rotating right: " << (*critNode)->getValue() << endl;
+        Node<T>* leftChild = (*critNode)->getLeftChild();
+        Node<T>* leftRC = leftChild->getRightChild();
+        leftChild->setRightChild(*critNode);
+        (*critNode)->setLeftChild(leftRC);
+        *critNode = leftChild;
+    }
 
 }
 
@@ -183,7 +212,7 @@ void Avltree<T>::remove(T v) {
 
 template <typename T>
 void Avltree<T>::simplePrint() {
-    cout << root->getValue() << endl;
+    traversalPrint(root);
 }
 
 template <typename T>
@@ -266,8 +295,8 @@ void Avltree<T>::print() {
 template <typename T>
 void Avltree<T>::traversalPrint(Node<T>* root) {
   if(root != 0) {
+    std::cout << root->getValue() << "(" << root->getBalance() << ") ";
     traversalPrint(root->getLeftChild());
-    std::cout << root->getValue() << ", ";
     traversalPrint(root->getRightChild());
   }
 }
@@ -279,25 +308,6 @@ void Avltree<T>::preorderPrint(Node<T>* root) {
     traversalPrint(root->getLeftChild());
     traversalPrint(root->getRightChild());
   }
-}
-
-template <typename T>
-void Avltree<T>::rotate(Node<T>*& critNode, int dir) {
-    cout << critNode << endl;
-    if (dir == -1) {
-        cout << "rotating left" << endl;
-        Node<T>*& rightChild = critNode->getRightChild();
-        Node<T>*& rightLC = rightChild->getLeftChild();
-        rightChild->setLeftChild(critNode);
-        critNode->setRightChild(rightLC);
-    } else if (dir == 1) {
-        cout << "rotating right" << endl;
-        Node<T>*& leftChild = critNode->getLeftChild();
-        Node<T>*& leftRC = leftChild->getRightChild();
-        leftChild->setRightChild(critNode);
-        critNode->setLeftChild(leftRC);
-    }
-
 }
 
 template class Avltree<int>;
