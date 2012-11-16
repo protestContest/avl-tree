@@ -34,8 +34,13 @@ bool Avltree<T>::find(T v) {
 
 template <typename T>
 void Avltree<T>::insert(T v) {
+    cout << "inserting " << v << endl;
+    if (root == 0) {
+        root = new Node<T>(v);
+    }
+
     Node<T>* insertNode = new Node<T>(v);
-    vector< Node<T>* >* path = 0;
+    vector< Node<T>* >* path = new vector< Node<T>* >();
     path->push_back(root);
     Node<T>* critNode = 0;
 
@@ -45,18 +50,16 @@ void Avltree<T>::insert(T v) {
             critNode = *curNode;
         }
         if (v < (*curNode)->getValue()) {
-            Node<T>* temp = (*curNode)->getLeftChild();
-            curNode = &temp;
+            curNode = &(*curNode)->getLeftChild();
         } else {
-            Node<T>* temp = (*curNode)->getRightChild();
-            curNode = &temp;
+            curNode = &(*curNode)->getRightChild();
         }
     }
 
     if (*curNode != 0) {
         Node<T>* oldNode = *curNode;
-        //insertNode->setLeftChild(oldNode->getLeftChild());
-        //insertNode->setRightChild(oldNode->getRightChild());
+        insertNode->setLeftChild(oldNode->getLeftChild());
+        insertNode->setRightChild(oldNode->getRightChild());
         *curNode = insertNode;
         delete oldNode;
         return;
@@ -64,7 +67,8 @@ void Avltree<T>::insert(T v) {
 
     *curNode = insertNode;
 
-    Node<T>* r;
+
+    Node<T>* r = insertNode;
     // no critical node
     if (critNode == 0) {
         r = root;
@@ -96,12 +100,14 @@ void Avltree<T>::insert(T v) {
 
             // single rotation
             if (critGCDir == critChildDir) {
+                cout << "single rotation" << endl;
                 critNode->setBalance(0);
                 r = critGC;
                 rotate(critNode, -critChildDir);
             }
             // double rotation
             else {
+                cout << "double rotation" << endl;
                 int rDir;
                 if (v < critGC->getValue()) {
                     r = critGC->getLeftChild();
@@ -120,6 +126,7 @@ void Avltree<T>::insert(T v) {
                     critNode->setBalance(0);
                 }
                 
+                // what if critNode == root?
                 rotate(critChild, -critGCDir);
                 rotate(critNode, -critChildDir);
             }
@@ -127,7 +134,7 @@ void Avltree<T>::insert(T v) {
         }
     }
 
-    while (r->getValue() != v) {
+    while (r != 0 && r->getValue() != v) {
         if (v < r->getValue()) {
             r->setBalance(-1);
             r = r->getLeftChild();
@@ -136,62 +143,8 @@ void Avltree<T>::insert(T v) {
             r = r->getRightChild();
         }
     }
+    delete path;
 
-
-/*
-  Node<T>* temp = new Node<T>(v);
-  Node<T>** curr = &root;
-  Node<T>* critNode = 0;
-  vector< Node<T>* > path;
-  vector<string> moves;
-  path->push_back(root);
-  int curDepth = 1;
-
-  while (*curr != 0) {
-    if (v < (*curr)->getValue()) {
-      curr = &((*curr)->getLeftChild());
-      moves->push_back("l");
-    } else if (v > (*curr)->getValue()) {
-      curr = &((*curr)->getRightChild());
-      moves->push_back("r");
-    } else {
-      return;
-    }
-    path->push_back(*curr);
-    ++curDepth;
-  }
-  *curr = temp;
-
-  while(!moves->empty()) {
-    Node<T>* curNode = path->back();
-    string move = moves->back();
-
-    if (move == "l") {
-        curNode->setBalance(-1); 
-    } else if (move == "r") {
-        curNode->setBalance(1);
-    }
-
-    if (curNode == critNode) {
-        break;
-    }
-    
-    path->pop_back();
-    moves->pop_back();
-  }
-
-  if (curDepth > depth) {
-    depth = curDepth;
-  }
-  
-    std::stringstream getLen;
-    getLen << v;
-    int length = getLen.str().length();
-    if (length > widestVal) {
-        widestVal = length;
-    }
-
-*/
 }
 
 template <typename T>
@@ -226,6 +179,11 @@ void Avltree<T>::remove(T v) {
     *cur = (*cur)->getLeftChild();
     
     delete deleteMe;
+}
+
+template <typename T>
+void Avltree<T>::simplePrint() {
+    cout << root->getValue() << endl;
 }
 
 template <typename T>
@@ -309,15 +267,37 @@ template <typename T>
 void Avltree<T>::traversalPrint(Node<T>* root) {
   if(root != 0) {
     traversalPrint(root->getLeftChild());
-    std::cout << root->getValue() << std::endl;
+    std::cout << root->getValue() << ", ";
     traversalPrint(root->getRightChild());
   }
 }
 
 template <typename T>
-void Avltree<T>::rotate(Node<T>* critNode, int dir) {
-    assert(critNode == critNode);
-    assert(dir == dir);
+void Avltree<T>::preorderPrint(Node<T>* root) {
+  if(root != 0) {
+    std::cout << root->getValue() << ", ";
+    traversalPrint(root->getLeftChild());
+    traversalPrint(root->getRightChild());
+  }
+}
+
+template <typename T>
+void Avltree<T>::rotate(Node<T>*& critNode, int dir) {
+    cout << critNode << endl;
+    if (dir == -1) {
+        cout << "rotating left" << endl;
+        Node<T>*& rightChild = critNode->getRightChild();
+        Node<T>*& rightLC = rightChild->getLeftChild();
+        rightChild->setLeftChild(critNode);
+        critNode->setRightChild(rightLC);
+    } else if (dir == 1) {
+        cout << "rotating right" << endl;
+        Node<T>*& leftChild = critNode->getLeftChild();
+        Node<T>*& leftRC = leftChild->getRightChild();
+        leftChild->setRightChild(critNode);
+        critNode->setLeftChild(leftRC);
+    }
+
 }
 
 template class Avltree<int>;

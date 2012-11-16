@@ -15,22 +15,22 @@ T Node<T>::getValue() {
 }
 
 template <typename T>
-Node<T>* Node<T>::getLeftChild() {
+Node<T>*& Node<T>::getLeftChild() {
   return leftChild;
 }
 
 template <typename T>
-void Node<T>::setLeftChild(Node<T>* lc) {
+void Node<T>::setLeftChild(Node<T>*& lc) {
   leftChild = lc;
 }
 
 template <typename T>
-Node<T>* Node<T>::getRightChild() {
+Node<T>*& Node<T>::getRightChild() {
   return rightChild;
 }
 
 template <typename T>
-void Node<T>::setRightChild(Node<T>* rc) {
+void Node<T>::setRightChild(Node<T>*& rc) {
   rightChild = rc;
 }
 

@@ -13,11 +13,11 @@ class Node {
   Node<T>(T v);
   T getValue();
 
-  Node<T>* getLeftChild();
-  void setLeftChild(Node<T>* n);
+  Node<T>*& getLeftChild();
+  void setLeftChild(Node<T>*& n);
 
-  Node<T>* getRightChild();
-  void setRightChild(Node<T>* n);
+  Node<T>*& getRightChild();
+  void setRightChild(Node<T>*& n);
 
   int getBalance();
   void setBalance(int b);
