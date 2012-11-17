@@ -74,7 +74,6 @@ void Avltree<T>::insert(T v) {
     if (critNode == 0) {
         r = root;
     } else {
-        cout << "Critical Node: " << (*critNode)->getValue() << endl;
         Node<T>** critChild = 0;
         int critChildDir = 0;
         if (v < (*critNode)->getValue()) {
@@ -104,14 +103,12 @@ void Avltree<T>::insert(T v) {
 
             // single rotation
             if (critGCDir == critChildDir) {
-                cout << "single rotation" << endl;
                 (*critNode)->setBalance(0);
                 r = critGC;
                 rotate(critNode, -critChildDir);
             }
             // double rotation
             else {
-                cout << "double rotation" << endl;
                 int rDir;
                 if (v < critGC->getValue()) {
                     r = critGC->getLeftChild();
@@ -140,14 +137,16 @@ void Avltree<T>::insert(T v) {
         }
     }
 
-    cout << "Updating balances:";
+    cout << "Updating balances: ";
     while (r->getValue() != v) {
-        cout << r->getValue() << " ";
+        cout << r->getValue();
         if (v < r->getValue()) {
             r->setBalance(r->getBalance()-1);
+            cout << "(" << r->getBalance() << ") ";
             r = r->getLeftChild();
         } else {
             r->setBalance(r->getBalance()+1);
+            cout << "(" << r->getBalance() << ") ";
             r = r->getRightChild();
         }
     }
@@ -179,7 +178,11 @@ void Avltree<T>::rotate(Node<T>** critNode, int dir) {
 template <typename T>
 void Avltree<T>::remove(T v) {
     Node<T>** cur = &root;
+    vector< Node<T>* >* path = new vector< Node<T>* >();
+
+
     while (*cur != 0 && (*cur)->getValue() != v) {
+        path->push_back(*cur);
         if (v < (*cur)->getValue()) {
             Node<T>* temp = (*cur)->getLeftChild();
             cur = &temp;
@@ -208,11 +211,16 @@ void Avltree<T>::remove(T v) {
     *cur = (*cur)->getLeftChild();
     
     delete deleteMe;
+
+
+
+    delete path;
 }
 
 template <typename T>
 void Avltree<T>::simplePrint() {
     traversalPrint(root);
+    cout << endl;
 }
 
 template <typename T>
