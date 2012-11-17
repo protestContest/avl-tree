@@ -34,7 +34,6 @@ bool Avltree<T>::find(T v) {
 
 template <typename T>
 void Avltree<T>::insert(T v) {
-    cout << "inserting " << v << endl;
     if (root == 0) {
         root = new Node<T>(v);
     }
@@ -89,7 +88,6 @@ void Avltree<T>::insert(T v) {
             (*critNode)->setBalance(0);
             r = insertNode;
             //r = path->back();
-            cout << "R becomes " << r->getValue() << endl;
         } else {
             Node<T>* critGC = 0;
             int critGCDir = 0;
@@ -137,20 +135,15 @@ void Avltree<T>::insert(T v) {
         }
     }
 
-    cout << "Updating balances (" << r->getValue() << "): ";
     while (r->getValue() != v) {
-        cout << r->getValue();
         if (v < r->getValue()) {
             r->setBalance(r->getBalance()-1);
-            cout << "(" << r->getBalance() << ") ";
             r = r->getLeftChild();
         } else {
             r->setBalance(r->getBalance()+1);
-            cout << "(" << r->getBalance() << ") ";
             r = r->getRightChild();
         }
     }
-    cout << endl;
     delete path;
 
 }
@@ -158,14 +151,12 @@ void Avltree<T>::insert(T v) {
 template <typename T>
 void Avltree<T>::rotate(Node<T>** critNode, int dir) {
     if (dir == -1) {
-        cout << "rotating left: " << (*critNode)->getValue() << endl;
         Node<T>* rightChild = (*critNode)->getRightChild();
         Node<T>* rightLC = (rightChild)->getLeftChild();
         rightChild->setLeftChild(*critNode);
         (*critNode)->setRightChild(rightLC);
         *critNode = rightChild;
     } else if (dir == 1) {
-        cout << "rotating right: " << (*critNode)->getValue() << endl;
         Node<T>* leftChild = (*critNode)->getLeftChild();
         Node<T>* leftRC = leftChild->getRightChild();
         leftChild->setRightChild(*critNode);
@@ -180,7 +171,6 @@ void Avltree<T>::remove(T v) {
     Node<T>** cur = &root;
     vector< Node<T>** >* path = new vector< Node<T>** >();
 
-    cout << "removing " << v << endl;
 
     while (*cur != 0 && (*cur)->getValue() != v) {
         path->push_back(cur);
@@ -215,7 +205,6 @@ void Avltree<T>::remove(T v) {
 
     // no other rebalancing
     if ((*parent)->getBalance() == 0) {
-        cout << "no rotation" << endl;
         if (v < (*parent)->getValue()) {
             (*parent)->setBalance(1);
         } else if (v > (*parent)->getValue()) {
@@ -223,7 +212,6 @@ void Avltree<T>::remove(T v) {
         }
     } else {
         while ((*parent) != 0 && (*parent)->getBalance() != 0) {
-            cout << "Updating " << (*parent)->getValue() << endl;
             assert((*parent)->getBalance() == 1 || (*parent)->getBalance() == -1);
             if ((*parent)->getBalance() == 1) {
                 if (v > (*parent)->getValue()) {
