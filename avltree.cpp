@@ -359,6 +359,24 @@ void Avltree<T>::traversalPrint(Node<T>* root) {
 }
 
 template <typename T>
+void Avltree<T>::inOrderTraversal() {
+  if(root != 0) {
+    traversalPrint(root->getLeftChild());
+    std::cout << root->getValue() << "(" << root->getBalance() << ") ";
+    traversalPrint(root->getRightChild());
+  }
+}
+
+template <typename T>
+void Avltree<T>::postOrderTraversal() {
+  if(root != 0) {
+    traversalPrint(root->getLeftChild());
+    traversalPrint(root->getRightChild());
+    std::cout << root->getValue() << "(" << root->getBalance() << ") ";
+  }
+}
+
+template <typename T>
 void Avltree<T>::preorderPrint(Node<T>* root) {
   if(root != 0) {
     std::cout << root->getValue() << ", ";

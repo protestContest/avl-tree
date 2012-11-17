@@ -23,6 +23,8 @@ class Avltree {
   void insert(T v);
   void print();
   void simplePrint();
+  void inOrderTraversal();
+  void postOrderTraversal();
 };
 
 
