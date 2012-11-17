@@ -184,12 +184,10 @@ void Avltree<T>::remove(T v) {
     while (*cur != 0 && (*cur)->getValue() != v) {
         path->push_back(*cur);
         if (v < (*cur)->getValue()) {
-            Node<T>* temp = (*cur)->getLeftChild();
-            cur = &temp;
+            cur = &((*cur)->getLeftChild());
         }
         else if (v > (*cur)->getValue()) {
-            Node<T>* temp = (*cur)->getRightChild();
-            cur = &temp;
+            cur = &((*cur)->getRightChild());
         }
     }
     if (*cur == 0) return;
@@ -197,6 +195,7 @@ void Avltree<T>::remove(T v) {
 
     Node<T>* iop = (*cur)->getLeftChild();
     if (iop == 0) {
+        cout << "no iop" << endl;
         *cur = (*cur)->getRightChild();
         delete deleteMe;
         return;
@@ -204,7 +203,6 @@ void Avltree<T>::remove(T v) {
 
     while (iop->getRightChild() != 0) {
         iop = iop->getRightChild();
-        ++depth;
     }
 
     iop->setRightChild((*cur)->getRightChild());
@@ -212,7 +210,17 @@ void Avltree<T>::remove(T v) {
     
     delete deleteMe;
 
+    Node<T>* parent = path->back();
+    path->pop_back();
 
+    // no other rebalancing
+    if (parent->getBalance() == 0) {
+        if (v < parent->getValue()) {
+            parent->setBalance(1);
+        } else if (v > parent->getValue()) {
+            parent->setBalance(-1);
+        }
+    }
 
     delete path;
 }
