@@ -20,8 +20,32 @@ int main() {
 
     cout << "-------------" << endl;
 
-    a->remove(1);
+    a->remove(4);
+    a->remove(7);
+    a->remove(12);
+    a->remove(6);
     a->simplePrint();
+
+    delete a;
+
+    cout << "================" << endl;
+
+    Avltree<double>* b = new Avltree<double>();
+
+    b->insert(1);
+    b->insert(2);
+    b->insert(3);
+    b->insert(9);
+    b->insert(8);
+    b->insert(5);
+    b->simplePrint();
+    b->insert(4);
+    b->simplePrint();
+    b->insert(7);
+    b->simplePrint();
+    b->insert(6);
+    b->simplePrint();
+
 
     return 0;
 }

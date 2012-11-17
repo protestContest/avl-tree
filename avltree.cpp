@@ -87,8 +87,8 @@ void Avltree<T>::insert(T v) {
         // no rotation
         if ((*critNode)->getBalance() != critChildDir) {
             (*critNode)->setBalance(0);
-            //r = insertNode;
-            r = path->back();
+            r = insertNode;
+            //r = path->back();
             cout << "R becomes " << r->getValue() << endl;
         } else {
             Node<T>* critGC = 0;
@@ -137,7 +137,7 @@ void Avltree<T>::insert(T v) {
         }
     }
 
-    cout << "Updating balances: ";
+    cout << "Updating balances (" << r->getValue() << "): ";
     while (r->getValue() != v) {
         cout << r->getValue();
         if (v < r->getValue()) {
@@ -178,11 +178,12 @@ void Avltree<T>::rotate(Node<T>** critNode, int dir) {
 template <typename T>
 void Avltree<T>::remove(T v) {
     Node<T>** cur = &root;
-    vector< Node<T>* >* path = new vector< Node<T>* >();
+    vector< Node<T>** >* path = new vector< Node<T>** >();
 
+    cout << "removing " << v << endl;
 
     while (*cur != 0 && (*cur)->getValue() != v) {
-        path->push_back(*cur);
+        path->push_back(cur);
         if (v < (*cur)->getValue()) {
             cur = &((*cur)->getLeftChild());
         }
@@ -195,30 +196,70 @@ void Avltree<T>::remove(T v) {
 
     Node<T>* iop = (*cur)->getLeftChild();
     if (iop == 0) {
-        cout << "no iop" << endl;
         *cur = (*cur)->getRightChild();
         delete deleteMe;
-        return;
-    }
+    } else {
+        while (iop->getRightChild() != 0) {
+            iop = iop->getRightChild();
+        }
 
-    while (iop->getRightChild() != 0) {
-        iop = iop->getRightChild();
+        iop->setRightChild((*cur)->getRightChild());
+        *cur = (*cur)->getLeftChild();
+        
+        delete deleteMe;
     }
-
-    iop->setRightChild((*cur)->getRightChild());
-    *cur = (*cur)->getLeftChild();
     
-    delete deleteMe;
-
-    Node<T>* parent = path->back();
+    Node<T>** parent = path->back();
     path->pop_back();
 
+
     // no other rebalancing
-    if (parent->getBalance() == 0) {
-        if (v < parent->getValue()) {
-            parent->setBalance(1);
-        } else if (v > parent->getValue()) {
-            parent->setBalance(-1);
+    if ((*parent)->getBalance() == 0) {
+        cout << "no rotation" << endl;
+        if (v < (*parent)->getValue()) {
+            (*parent)->setBalance(1);
+        } else if (v > (*parent)->getValue()) {
+            (*parent)->setBalance(-1);
+        }
+    } else {
+        while ((*parent) != 0 && (*parent)->getBalance() != 0) {
+            cout << "Updating " << (*parent)->getValue() << endl;
+            assert((*parent)->getBalance() == 1 || (*parent)->getBalance() == -1);
+            if ((*parent)->getBalance() == 1) {
+                if (v > (*parent)->getValue()) {
+                    // no rotation
+                    (*parent)->setBalance(0);
+                } else if (v < (*parent)->getValue()) {
+                    // STOP! rotation time!
+                    (*parent)->setBalance(0);
+                    Node<T>** parentRC = &((*parent)->getRightChild());
+                    if ((*parentRC)->getBalance() == -1) {
+                        (*parentRC)->setBalance(0);
+                        rotate(parentRC, 1);
+                    }
+                    rotate(parent, -1);
+                }
+            } else if ((*parent)->getBalance() == -1) {
+                if (v < (*parent)->getValue()) {
+                    (*parent)->setBalance(0);
+                    // no rotation
+                } else if (v > (*parent)->getValue()) {
+                    // STOP! rotation time!
+                    (*parent)->setBalance(0);
+                    Node<T>** parentLC = &((*parent)->getLeftChild());
+                    if ((*parentLC)->getBalance() == 1) {
+                        (*parentLC)->setBalance(0);
+                        rotate(parentLC, -1);
+                    }
+                    rotate(parent, 1);
+                }
+            }
+            
+            if (path->empty()) {
+                break;
+            }
+            parent = path->back();
+            path->pop_back();
         }
     }
 
